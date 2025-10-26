@@ -1,12 +1,14 @@
 package com.example.BadmintonShop.Auth;
 
 import com.example.BadmintonShop.Model.User;
+import com.example.BadmintonShop.Service.RedisService;
 import com.example.BadmintonShop.Service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,38 +20,42 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
-
+@Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private JwtUtils jwtUtils;
-    private UserService userService;
+    private final JwtUtils jwtUtils;
+    private final UserService userService;
+    private final RedisService redisService;
 
-    public JwtAuthenticationFilter(JwtUtils jwtUtils, UserService userService) {
-        this.jwtUtils = jwtUtils;
-        this.userService = userService;
-    }
+
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)
-            throws ServletException, IOException {
+            throws ServletException, IOException
+    {
+        if (request.getServletPath().startsWith("/auth/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
        String token = null;
-       String username = null;
+        String email = null; // Đổi tên biến cho rõ ràng
        try {
            if(authHeader != null && authHeader.startsWith("Bearer ")){
                token = authHeader.substring(7);
-                username = jwtUtils.extractUsername(token);
+                email = jwtUtils.extractEmail(token);
            }
 
-           if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
-               User user =(User) userService.loadUserByUsername(username);
-               if(jwtUtils.validateToken(token, user)){
+           if(email != null && SecurityContextHolder.getContext().getAuthentication() == null){
+               User user =(User) userService.loadUserByUsername(email);
+               if(jwtUtils.validateToken(token, user) && !redisService.isTokenBlacklisted(token) ){
                    List<String> roles = jwtUtils.extractRoles(token);
                    List<SimpleGrantedAuthority> authorities =
                            roles.stream().map(SimpleGrantedAuthority::new).toList();
                    UsernamePasswordAuthenticationToken authToken =
-                           new UsernamePasswordAuthenticationToken(username, null, authorities);
+                           new UsernamePasswordAuthenticationToken(email, null, authorities);
                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                    SecurityContextHolder.getContext().setAuthentication(authToken);
                }

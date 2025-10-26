@@ -16,17 +16,21 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor()
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
 public class User implements UserDetails {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
+    String email;
     String username;
     String password;
     String phone;
     String address;
     Date dob;
+    boolean active;
     String roleName;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
             @JoinTable(name = "user_role",
                     joinColumns = @JoinColumn(name = "user_id"),
                     inverseJoinColumns = @JoinColumn(name = "role_id"))

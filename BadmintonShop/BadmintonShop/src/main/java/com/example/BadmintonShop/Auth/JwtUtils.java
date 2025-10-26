@@ -4,8 +4,10 @@ import com.example.BadmintonShop.Model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -17,20 +19,22 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Component
+@Getter
 public class JwtUtils {
     @Value("${jwt.secret}")
     private String privateKey;
 
-    @Value("$jwt.expiration{}")
+    @Value("${jwt.expiration}")
     private long jwtExpiration;
 
-    @Value("$jwt.long.expiration{}")
+    @Value("${jwt.long.expiration}")
     private long jwtLongExpiration;
 
     private Key key;
 
     @PostConstruct
     public void init(){
+//        byte[] keyBytes = Decoders.BASE64.decode(privateKey);
         key = Keys.hmacShaKeyFor(privateKey.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -49,7 +53,7 @@ public class JwtUtils {
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(user.getUsername())
+                .setSubject(user.getEmail())
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -71,7 +75,7 @@ public class JwtUtils {
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(user.getUsername())
+                .setSubject(user.getEmail())
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -82,11 +86,11 @@ public class JwtUtils {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
-                .parseClaimsJwt(token)
+                .parseClaimsJws(token)
                 .getBody();
     }
 
-    public String extractUsername(String token){
+    public String extractEmail(String token){
         return extractClaims(token).getSubject();
     }
 
@@ -115,8 +119,8 @@ public class JwtUtils {
     }
 
     public Boolean validateToken(String token, User user){
-        final String username = extractUsername(token);
-        return (username.equals(user.getUsername())) && !isTokenExpired(token);
+        final String email = extractEmail(token);
+        return (email.equals(user.getEmail())) && !isTokenExpired(token);
     }
 
 }
