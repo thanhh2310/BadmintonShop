@@ -8,10 +8,7 @@ import com.example.BadmintonShop.DTO.Response.TokenResponse;
 import com.example.BadmintonShop.Model.User;
 import com.example.BadmintonShop.Service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -44,6 +41,15 @@ public class AuthController {
                 .code(200)
                 .message("login successfully")
                 .data(authService.login(request))
+                .build();
+    }
+
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@RequestHeader("Authorization") String authHeader){
+        authService.logout(authHeader);
+        return ApiResponse.<Void>builder()
+                .code(200)
+                .message("Logout successfully")
                 .build();
     }
 }

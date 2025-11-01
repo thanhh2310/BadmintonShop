@@ -22,10 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -76,8 +73,6 @@ public class AuthService {
                 .orElseThrow(() -> new WebErrorConfig(ErrorCode.USER_NOT_FOUND));
         Role userRole = roleRepository.findByRoleName(RoleName.ROLE_USER.name());
         user.setActive(true);
-        user.setRoleName(RoleName.ROLE_USER.name());
-
         // --- SỬA LẠI CHỖ NÀY ---
         // Tạo một ArrayList (có thể thay đổi được)
         List<Role> roles = new ArrayList<>();
@@ -109,6 +104,26 @@ public class AuthService {
                     .build();
         } catch (AuthenticationException e) {
             throw new RuntimeException(e); // Nên ném lỗi 401
+        }
+    }
+
+    public void logout(String authHeader) {
+        if(authHeader != null && authHeader.startsWith("Bearer ")){
+            String token = authHeader.substring(7);
+            // 1. Lấy thời điểm hết hạn tuyệt đối từ token
+            Date expirationDate = jwtUtils.extractExpiration(token);
+            long expirationMillis = expirationDate.getTime();
+
+            // 2. Lấy thời điểm hiện tại
+            long nowMillis = System.currentTimeMillis();
+
+            // 3. Tính toán thời gian còn lại (TTL)
+            long ttlMillis = expirationMillis - nowMillis;
+
+            // 4. Chỉ blacklist nếu token chưa hết hạn
+            if (ttlMillis > 0) {
+                redisService.blackListToken(token, ttlMillis); // Truyền TTL vào
+            }
         }
     }
 }

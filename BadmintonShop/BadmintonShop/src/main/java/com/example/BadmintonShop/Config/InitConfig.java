@@ -38,7 +38,6 @@ public class InitConfig {
             user.setUsername("admin");
             user.setEmail("admin@admin.com");
             user.setPassword(passwordEncoder.encode("admin"));
-            user.setRoleName(RoleName.ROLE_ADMIN.name());
             Role adminRole = roleRepository.findByRoleName(RoleName.ROLE_ADMIN.name());
             user.setRoles(List.of(adminRole));
             user.setActive(true);
