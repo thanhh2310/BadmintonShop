@@ -6,6 +6,24 @@ import lombok.experimental.FieldDefaults;
 
 import java.util.Set;
 
+@NamedEntityGraph(
+        name = "ProductDetail.withDetails",
+        attributeNodes = {
+                @NamedAttributeNode(value = "product", subgraph = "product-subgraph"),
+                @NamedAttributeNode("color"),
+                @NamedAttributeNode("size"),
+                @NamedAttributeNode("image")
+        },
+        subgraphs = {
+                @NamedSubgraph(
+                        name = "product-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode("brand"),
+                                @NamedAttributeNode("category")
+                        }
+                )
+        }
+)
 @Entity
 @Getter
 @Setter
