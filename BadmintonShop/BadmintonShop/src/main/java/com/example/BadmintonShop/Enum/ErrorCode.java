@@ -23,7 +23,14 @@ public enum ErrorCode {
     COLOR_IN_USE(903,"Color in use" ),
     SIZE_ALREADY_EXISTS(1102,"Size already exists" ),
     SIZE_NOT_FOUND(1101,"Size not found" ),
-    SIZE_IN_USE(1103,"Size in use" );
+    SIZE_IN_USE(1103,"Size in use" ),
+    IMAGE_NOT_FOUND(1201,"Image not found" ),
+    IMAGE_ALREADY_EXISTS(1202,"Image already exists" ),
+    IMAGE_IN_USE(1203,"Image in use" ),
+    RACQUET_NOT_FOUND(1204,"Racquet not found" ),
+    RACQUET_IN_USE(1205,"Racquet in use" ),
+    SHOES_NOT_FOUND(1206,"Shoes not found" ),
+    SHOES_IN_USE(1207,"Shoes in use" );
 
     ErrorCode(int code, String message) {
         this.code = code;
