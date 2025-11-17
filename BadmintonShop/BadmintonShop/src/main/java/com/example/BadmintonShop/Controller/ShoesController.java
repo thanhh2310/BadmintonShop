@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/shoes") // Endpoint cơ sở cho Shoes
+@RequestMapping("/public/shoes") // Endpoint cơ sở cho Shoes
 @RequiredArgsConstructor
 public class ShoesController {
 

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/sizes") // Endpoint cơ sở cho Size
+@RequestMapping("/public/sizes") // Endpoint cơ sở cho Size
 @RequiredArgsConstructor
 public class SizeController {
 

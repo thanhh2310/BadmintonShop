@@ -20,19 +20,19 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    public ApiResponse<UserProfileResponse> getMyProfile(@AuthenticationPrincipal User user){
+    public ApiResponse<UserProfileResponse> getMyProfile(){
 
         return ApiResponse.<UserProfileResponse>builder()
                 .code(200)
                 .message("Get successfully")
-                .data(userService.getMyProfile(user))
+                .data(userService.getMyProfile())
                 .build();
     }
 
     @PutMapping("/me")
-    public ApiResponse<Void> updateMyProfile (@AuthenticationPrincipal User user,
+    public ApiResponse<Void> updateMyProfile (@AuthenticationPrincipal String email,
                                               @Valid @RequestBody UserUpdateRequest request){
-        userService.updateMyProfile(user, request);
+        userService.updateMyProfile(email, request);
         return ApiResponse.<Void>builder()
                 .code(200)
                 .message("Update successfully")
@@ -40,9 +40,9 @@ public class UserController {
     }
 
     @PostMapping("/me/change-password")
-    public ApiResponse<Void> changePassword(@AuthenticationPrincipal User user,
+    public ApiResponse<Void> changePassword(@AuthenticationPrincipal String email,
                                             @Valid @RequestBody ChangePasswordRequest request){
-        userService.changePassword(user, request);
+        userService.changePassword(email, request);
         return ApiResponse.<Void>builder()
                 .code(200)
                 .message("Change password successfully")

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/images") // Endpoint cơ sở cho Image
+@RequestMapping("/public/images") // Endpoint cơ sở cho Image
 @RequiredArgsConstructor
 public class ImageController {
 
