@@ -48,6 +48,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/auth/**").permitAll()
                                 .requestMatchers("/public/**").permitAll()
+                                .requestMatchers("/api/payment/vnpay-return/**").permitAll()
                                 .requestMatchers("/users/**").hasAnyRole("USER","ADMIN")
                                 .anyRequest().authenticated()
                         )
