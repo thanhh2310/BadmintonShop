@@ -12,6 +12,8 @@ public enum ErrorCode {
     CANNOT_DELETE_DEFAULT_ROLE(503, "Can't delete this role"),
     ROLE_IN_USE(504, "Role in use"),
     PRODUCT_NOT_FOUND(600, "Product not found"),
+    PRODUCT_ALREADY_EXISTS(601, "Product already exists" ),
+    PRODUCT_IN_USE(602, "Product in use" ),
     CATEGORY_ALREADY_EXISTS(700,"Category already exists" ),
     CATEGORY_IN_USE(701, "Category in use"),
     CATEGORY_NOT_FOUND(702,"Category not found" ),
@@ -30,7 +32,12 @@ public enum ErrorCode {
     RACQUET_NOT_FOUND(1204,"Racquet not found" ),
     RACQUET_IN_USE(1205,"Racquet in use" ),
     SHOES_NOT_FOUND(1206,"Shoes not found" ),
-    SHOES_IN_USE(1207,"Shoes in use" );
+    SHOES_IN_USE(1207,"Shoes in use" ),
+    PRODUCT_DETAIL_NOT_FOUND(1301,"Product detail not found" ),
+    PRODUCT_DETAIL_IN_USE(1302, "Product detail in use"),
+    OUT_OF_STOCK(1303,"Out of stock" ),
+    CART_ITEM_NOT_FOUND(1304,"Cart item not found" ),
+    FORBIDDEN(1305,"Not permisson to fix this category" );
 
     ErrorCode(int code, String message) {
         this.code = code;

@@ -1,16 +1,16 @@
 package com.example.BadmintonShop.Controller;
 
+import com.example.BadmintonShop.DTO.Request.ProductDetailRequest;
 import com.example.BadmintonShop.DTO.Response.ApiResponse;
 import com.example.BadmintonShop.DTO.Response.PaginationResponse;
 import com.example.BadmintonShop.DTO.Response.ProductDetailResponseDTO;
 import com.example.BadmintonShop.Service.ProductDetailService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/public/productDetails")
@@ -26,6 +26,47 @@ public class ProductDetailController {
                 .code(200)
                 .message("Get all successfully")
                 .data(productDetailService.getAllProducts(pageable))
+                .build();
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<ProductDetailResponseDTO> getProductDetailById(@PathVariable Integer id) {
+        return ApiResponse.<ProductDetailResponseDTO>builder()
+                .code(200)
+                .message("Get detail successfully")
+                .data(productDetailService.getProductDetailById(id))
+                .build();
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<ProductDetailResponseDTO> createProductDetail(@Valid @RequestBody ProductDetailRequest request) {
+        return ApiResponse.<ProductDetailResponseDTO>builder()
+                .code(201)
+                .message("Tạo chi tiết sản phẩm thành công")
+                .data(productDetailService.createProductDetail(request))
+                .build();
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<ProductDetailResponseDTO> updateProductDetail(
+            @PathVariable Integer id,
+            @Valid @RequestBody ProductDetailRequest request) {
+        return ApiResponse.<ProductDetailResponseDTO>builder()
+                .code(200)
+                .message("Cập nhật chi tiết sản phẩm thành công")
+                .data(productDetailService.updateProductDetail(id, request))
+                .build();
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<Void> deleteProductDetail(@PathVariable Integer id) {
+        productDetailService.deleteProductDetail(id);
+        return ApiResponse.<Void>builder()
+                .code(200)
+                .message("Xóa chi tiết sản phẩm thành công")
                 .build();
     }
 

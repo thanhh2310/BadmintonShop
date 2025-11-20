@@ -1,13 +1,16 @@
 package com.example.BadmintonShop.Service;
 
+import com.example.BadmintonShop.Config.WebErrorConfig;
+import com.example.BadmintonShop.DTO.Request.ProductDetailRequest;
 import com.example.BadmintonShop.DTO.Response.PaginationResponse;
 import com.example.BadmintonShop.DTO.Response.ProductDetailResponseDTO;
+import com.example.BadmintonShop.Enum.ErrorCode;
 import com.example.BadmintonShop.Mapper.ProductDetailMapper;
 import com.example.BadmintonShop.Model.Brand;
 import com.example.BadmintonShop.Model.Category;
 import com.example.BadmintonShop.Model.Product;
 import com.example.BadmintonShop.Model.ProductDetail;
-import com.example.BadmintonShop.Repository.ProductDetailRepository;
+import com.example.BadmintonShop.Repository.*;
 import jakarta.persistence.criteria.Join;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ProductDetailService {
     private final ProductDetailRepository productDetailRepository;
+    private final ProductRepository productRepository;
+    private final ColorRepository colorRepository;
+    private final SizeRepository sizeRepository;
+    private final ImageRepository imageRepository;
     private final ProductDetailMapper productDetailMapper;
 
     @Transactional(readOnly = true)
@@ -85,6 +92,64 @@ public class ProductDetailService {
                 .map(productDetailMapper::toProductDetailDTO);
 
         return PaginationResponse.fromPage(dtoPage);
+    }
+
+    public ProductDetailResponseDTO getProductDetailById(Integer id) {
+        ProductDetail pd = productDetailRepository.findById(id)
+                .orElseThrow(() -> new WebErrorConfig(ErrorCode.PRODUCT_DETAIL_NOT_FOUND));
+        return productDetailMapper.toProductDetailDTO(pd);
+    }
+
+
+    public ProductDetailResponseDTO createProductDetail(ProductDetailRequest request) {
+        ProductDetail pd = new ProductDetail();
+        return saveOrUpdateProductDetail(pd, request);
+    }
+
+
+    @Transactional
+    public ProductDetailResponseDTO updateProductDetail(Integer id, ProductDetailRequest request) {
+        ProductDetail pd = productDetailRepository.findById(id)
+                .orElseThrow(() -> new WebErrorConfig(ErrorCode.PRODUCT_DETAIL_NOT_FOUND));
+
+        return saveOrUpdateProductDetail(pd, request);
+    }
+
+
+    @Transactional
+    public void deleteProductDetail(Integer id) {
+        if (!productDetailRepository.existsById(id)) {
+            throw new WebErrorConfig(ErrorCode.PRODUCT_DETAIL_NOT_FOUND);
+        }
+        // Cần xử lý cẩn thận: Nếu đã có trong Order, có thể không cho xóa
+        // hoặc chỉ đánh dấu là ngưng bán (soft delete).
+        // Ở đây tôi dùng xóa cứng (hard delete) cơ bản:
+        try {
+            productDetailRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new WebErrorConfig(ErrorCode.PRODUCT_DETAIL_IN_USE);
+        }
+    }
+
+    private ProductDetailResponseDTO saveOrUpdateProductDetail(ProductDetail pd, ProductDetailRequest request) {
+        pd.setDescription(request.getDescription());
+        pd.setPrice(request.getPrice());
+        pd.setQuantity(request.getQuantity());
+
+        pd.setProduct(productRepository.findById(request.getProductId())
+                .orElseThrow(() -> new WebErrorConfig(ErrorCode.PRODUCT_NOT_FOUND)));
+
+        pd.setColor(colorRepository.findById(request.getColorId())
+                .orElseThrow(() -> new WebErrorConfig(ErrorCode.COLOR_NOT_FOUND)));
+
+        pd.setSize(sizeRepository.findById(request.getSizeId())
+                .orElseThrow(() -> new WebErrorConfig(ErrorCode.SIZE_NOT_FOUND)));
+
+        pd.setImage(imageRepository.findById(request.getImageId())
+                .orElseThrow(() -> new WebErrorConfig(ErrorCode.IMAGE_NOT_FOUND)));
+
+        ProductDetail savedPd = productDetailRepository.save(pd);
+        return productDetailMapper.toProductDetailDTO(savedPd);
     }
 
     // Lọc theo Brand (Join qua Product)

@@ -18,6 +18,6 @@ public class ProductResponse {
     private RacquetResponse racquetResponse;
     private ShoesResponse shoesResponse;
 
-    private Set<ProductDetailResponseDTO> variants;
+    private List<ProductDetailResponseDTO> variants;
 
 }

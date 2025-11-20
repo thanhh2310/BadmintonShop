@@ -18,22 +18,15 @@ public class ProductMapper {
     private final ProductDetailMapper productDetailMapper;
 
     public ProductResponse toProductResponseDTO(Product product) {
-        // Chuyển đổi Set<ProductDetail> (Entity) thành List<ProductDetailVariantDTO>
-//        List<ProductDetailResponseDTO> variants = product.getProductDetails().stream()
-//                .map(pd -> ProductDetailResponseDTO.builder()
-//                        .productDetailId(pd.getId())
-//                        .description(pd.getDescription())
-//                        .price(pd.getPrice())
-//                        .quantityInStock(pd.getQuantity())
-//                        .colorName(pd.getColor().getName())
-//                        .sizeName(pd.getSize().getName())
-//                        .imageUrl(pd.getImage().getUrl())
-//                        .build())
-//                .collect(Collectors.toList());
 
-        Set<ProductDetailResponseDTO> variants = product.getProductDetails().stream()
-                .map(productDetailMapper::toProductDetailDTO)
-                .collect(Collectors.toSet());
+        List<ProductDetailResponseDTO> variants = null;
+        if (product.getProductDetails() != null) {
+            variants = product.getProductDetails().stream()
+                    .map(productDetailMapper::toProductDetailDTO)
+                    .collect(Collectors.toList());
+        } else {
+            variants = List.of();
+        }
 
         return ProductResponse.builder()
                 .productId(product.getId())

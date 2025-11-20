@@ -11,7 +11,6 @@ public class ProductDetailMapper {
             return null;
         }
 
-        // Vì đã JOIN FETCH, các lệnh .get() này không tốn thêm query
         return ProductDetailResponseDTO.builder()
                 .productDetailId(pd.getId())
                 .productName(pd.getProduct().getName())

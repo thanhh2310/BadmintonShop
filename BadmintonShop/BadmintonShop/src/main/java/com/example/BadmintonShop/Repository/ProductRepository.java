@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Integer> {
+    boolean existsByName(String name);
+
     @Query("SELECT DISTINCT p FROM Product p " +
             "LEFT JOIN FETCH p.brand " +
             "LEFT JOIN FETCH p.category " +
@@ -19,4 +21,6 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
             "LEFT JOIN FETCH pd.image " +
             "WHERE p.id = :id")
     Optional<Product> findByIdWithDetails(@Param("id") Integer id);
+
+    Optional<Product> findByName(String name);
 }
